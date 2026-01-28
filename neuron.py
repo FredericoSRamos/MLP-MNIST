@@ -1,23 +1,26 @@
 import random
+import math
 
 class Neuron():
-    activation = 0
-    weights = []
-
     def __init__(self, layer, previous_layer_amount):
-        if layer != 0:
-            self.bias = random.random()
-            self.weights = [random.random() for _ in range(previous_layer_amount)]
+        self.bias = random.uniform(-1, 1)
+        self.weights = [random.uniform(-1, 1) for _ in range(previous_layer_amount)]
         self.layer = layer
+        self.activation = 0
+        self.delta = 0
 
     def activate(self, input):
-        sum = 0
+        sum = self.bias
 
-        for i in input:
-            for j in self.weights:
-                sum += i.activation * j
+        for i in range(len(input)):
+            sum += input[i].activation * self.weights[i]
 
-        self.activation = max(0, sum)
+        self.activation = 1 / (1 + math.pow(math.e, -sum))
+
+    def update_weight(self, lr, inputs):
+        for i in range(len(self.weights)):
+            self.weights[i] += lr * self.delta * inputs[i]
+            self.bias += lr * self.delta
 
     def print(self):
         return f"Ativação: {self.activation}. Peso: {self.weights}"
