@@ -1,4 +1,5 @@
 from neuron import Neuron
+from save_state import SaveState
 
 class Network():
     def __init__(self, num_neurons):
@@ -16,10 +17,10 @@ class Network():
 
     def feed(self, input, expected):
         if len(expected) != len(self.layers[-1]):
-            raise ValueError("Size of expected values list cannot be different than number of neuron in last layer")
+            raise ValueError("Size of expected values list cannot be different than number of neurons in last layer")
 
         if len(input) != len(self.layers[0]):
-            raise ValueError("Number of inputs cannot be different than number of neuron in first layer")
+            raise ValueError("Number of inputs cannot be different than number of neurons in first layer")
         
         self.expected = expected
         
@@ -65,9 +66,48 @@ class Network():
             total += 1
 
         return sum / total
+    
+    def save(self):
+        other_layers = self.layers[1::]
+        num_neurons_layer = [len(self.layers[0])]
+        weights = []
+        biases = []
+        for i, layer in enumerate(other_layers):
+            num_neurons_layer.append(len(layer))
+            weights.append([])
+            biases.append([])
+            for neuron in layer:
+                weights[i].append(neuron.weights)
+                biases[i].append(neuron.bias)
+
+        return SaveState(
+            num_neurons_layer,
+            weights,
+            biases
+        )
+
+    def saveToFile(self, filePath):
+        self.save().save(filePath)
+
+    def load(savedData):
+        numNeurons = savedData.numNeurons
+        weights = savedData.weights
+        biases = savedData.biases
+
+        network = Network(numNeurons)
+        for i, layer in enumerate(network.layers[1::]):
+            for j, neuron in enumerate(layer):
+                neuron.weights = weights[i][j]
+                neuron.bias = biases[i][j]
+
+        return network
+
+    def loadFromFile(filePath):
+        return Network.load(SaveState.load(filePath))
 
     def print(self):
         for layer in self.layers:
             for neuron in layer:
                 print(neuron.print(), end=" ")
             print()
+        
