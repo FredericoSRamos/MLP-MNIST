@@ -3,9 +3,9 @@ import math
 
 class Neuron():
     def __init__(self, layer, previous_layer_amount):
-        self.bias = random.uniform(-1, 1)
         self.weights = [random.uniform(-1, 1) for _ in range(previous_layer_amount)]
         self.layer = layer
+        self.bias = 0
         self.activation = 0
         self.delta = 0
 
@@ -23,4 +23,4 @@ class Neuron():
             self.bias += lr * self.delta
 
     def print(self):
-        return f"Ativação: {self.activation}. Peso: {self.weights}"
+        return f"Activation: {self.activation}. Weight: {self.weights}"
